@@ -54,7 +54,7 @@ const Customizer = () => {
     try {
       // call backend to generate image
       setGeneratingImg(true)
-      const response = await fetch('http://localhost:8080/api/v1/dalle', {
+      const response = await fetch('http://127.0.0.1:8080/api/v1/dalle', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -162,4 +162,3 @@ const Customizer = () => {
 
 export default Customizer
 
-// https://youtu.be/tllZWCQZ9_0?t=6211
