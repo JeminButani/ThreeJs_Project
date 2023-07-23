@@ -36,9 +36,39 @@ const Customizer = () => {
       case 'filepicker':
         return <FilePicker file={file} setFile={setFile} readFile={readFile} />
       case 'aipicker':
-        return <AIPicker />
+        return (
+          <AIPicker
+            prompt={prompt}
+            setPrompt={setPrompt}
+            generatingImg={generatingImg}
+            handleSubmit={handleSubmit}
+          />
+        )
       default:
         return null
+    }
+  }
+  const handleSubmit = async type => {
+    if (!prompt) return alert('Please enter a prompt')
+
+    try {
+      // call backend to generate image
+      setGeneratingImg(true)
+      const response = await fetch('http://localhost:8080/api/v1/dalle', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ prompt })
+      })
+
+      const data = await response.json()
+      handleDecals(type, `data:image/png;base64,${data.photo}`)
+    } catch (error) {
+      alert(error.message)
+    } finally {
+      setGeneratingImg(false)
+      setActiveEditorTab('')
     }
   }
 
@@ -62,6 +92,14 @@ const Customizer = () => {
         state.isLogoTexture = true
         state.isFullTexture = false
     }
+
+    // after setting the state, update the active filter tab
+    setActiveFilterTab(prevState => {
+      return {
+        ...prevState,
+        [tabName]: !prevState[tabName]
+      }
+    })
   }
   const readFile = type => {
     reader(file).then(result => {
@@ -110,9 +148,9 @@ const Customizer = () => {
               <Tab
                 key={tab.name}
                 tab={tab}
-                handleClick={() => {}}
+                handleClick={() => handleActiveFilterTab(tab.name)}
                 isFilterTab
-                isActiveTab=''
+                isActiveTab={activeFilterTab[tab.name]}
               />
             ))}
           </motion.div>
@@ -123,3 +161,5 @@ const Customizer = () => {
 }
 
 export default Customizer
+
+// https://youtu.be/tllZWCQZ9_0?t=6211
